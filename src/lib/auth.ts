@@ -28,21 +28,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 password: { label: "Password", type: "password" },
             },
             authorize: async (credentials) => {
+                console.log("Authorize called with:", credentials?.email);
                 const parsedCredentials = z
                     .object({ email: z.string().email(), password: z.string().min(6) })
                     .safeParse(credentials)
 
                 if (parsedCredentials.success) {
                     const { email, password } = parsedCredentials.data
+                    console.log("Looking up user:", email);
                     const user = await getUser(email)
 
-                    if (!user) return null
+                    if (!user) {
+                        console.log("User not found in DB");
+                        return null;
+                    }
 
                     // In a real app, use bcrypt.compare here
                     // For this demo with seeded data, we're doing direct comparison
                     if (password === user.password) {
+                        console.log("Password match success");
                         return user
+                    } else {
+                        console.log("Password match failed");
                     }
+                } else {
+                    console.log("Credential parsing failed", parsedCredentials.error);
                 }
                 return null
             },
