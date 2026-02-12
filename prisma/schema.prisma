@@ -1,0 +1,142 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      String   @default("VIEWER")
+  villageId String?
+  village   Village? @relation(fields: [villageId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  reviewedSubmissions Submission[] @relation("ReviewedBy")
+}
+
+model Village {
+  id         String   @id @default(cuid())
+  name       String
+  district   String
+  state      String
+  lat        Float
+  lng        Float
+  population Int?
+  createdAt  DateTime @default(now())
+
+  users    User[]
+  devices  Device[]
+  students Student[]
+}
+
+model Device {
+  id             String   @id @default(cuid())
+  serial         String   @unique
+  villageId      String
+  village        Village  @relation(fields: [villageId], references: [id])
+  installedAt    DateTime
+  lastSync       DateTime?
+  batteryPct     Float    @default(100)
+  solarStatus    String   @default("CHARGING")
+  deviceStatus   String   @default("ONLINE")
+  contentVersion String   @default("1.0.0")
+  uptimePct      Float    @default(99)
+  createdAt      DateTime @default(now())
+
+  students   Student[]
+  syncEvents SyncEvent[]
+  powerLogs  PowerLog[]
+}
+
+model Student {
+  id         String   @id @default(cuid())
+  firstName  String
+  ageGroup   String
+  villageId  String
+  village    Village  @relation(fields: [villageId], references: [id])
+  deviceId   String
+  device     Device   @relation(fields: [deviceId], references: [id])
+  enrolledAt DateTime @default(now())
+
+  progress    StudentProgress[]
+  submissions Submission[]
+}
+
+model Subject {
+  id   String @id @default(cuid())
+  name String @unique
+  icon String
+
+  skillNodes SkillNode[]
+}
+
+model SkillNode {
+  id        String     @id @default(cuid())
+  subjectId String
+  subject   Subject    @relation(fields: [subjectId], references: [id])
+  title     String
+  level     Int
+  parentId  String?
+  parent    SkillNode?  @relation("SkillNodeParent", fields: [parentId], references: [id])
+  children  SkillNode[] @relation("SkillNodeParent")
+
+  progress    StudentProgress[]
+  submissions Submission[]
+}
+
+model StudentProgress {
+  id          String    @id @default(cuid())
+  studentId   String
+  student     Student   @relation(fields: [studentId], references: [id])
+  skillNodeId String
+  skillNode   SkillNode @relation(fields: [skillNodeId], references: [id])
+  masteredAt  DateTime?
+  attempts    Int       @default(0)
+  score       Float     @default(0)
+
+  @@unique([studentId, skillNodeId])
+}
+
+model Submission {
+  id              String    @id @default(cuid())
+  studentId       String
+  student         Student   @relation(fields: [studentId], references: [id])
+  skillNodeId     String
+  skillNode       SkillNode @relation(fields: [skillNodeId], references: [id])
+  type            String    @default("PHOTO")
+  status          String    @default("PENDING")
+  fileUrl         String?
+  transcript      String?
+  teacherNote     String?
+  reviewedById    String?
+  reviewedBy      User?     @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt      DateTime?
+  confidenceScore Float?
+  createdAt       DateTime  @default(now())
+}
+
+model SyncEvent {
+  id            String   @id @default(cuid())
+  deviceId      String
+  device        Device   @relation(fields: [deviceId], references: [id])
+  syncedAt      DateTime @default(now())
+  recordsSynced Int
+  errorsLogged  Int      @default(0)
+}
+
+model PowerLog {
+  id               String   @id @default(cuid())
+  deviceId         String
+  device           Device   @relation(fields: [deviceId], references: [id])
+  loggedAt         DateTime @default(now())
+  panelWatts       Float
+  batteryPct       Float
+  consumptionWatts Float
+}
