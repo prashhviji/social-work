@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import { cn } from "@/lib/utils"
 import { notFound } from "next/navigation"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
