@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import type { Prisma } from "@prisma/client"
 import { KpiCard } from "@/components/kpi-card"
 import { DashboardCharts } from "@/components/dashboard-charts"
 import { Users, TabletSmartphone, GraduationCap, Clock, AlertTriangle } from "lucide-react"
@@ -10,16 +11,8 @@ export default async function DashboardPage() {
     let studentsCount = 0
     let submissionsCount = 0
     let recentSyncs: Awaited<ReturnType<typeof prisma.syncEvent.findMany<{ include: { device: { include: { village: true } } } }>>> = []
-    const lowBatteryQuery = prisma.device.findMany({
-        where: {
-            OR: [
-                { batteryPct: { lt: 20 } },
-                { lastSync: { lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }
-            ]
-        },
-        include: { village: true }
-    })
-    let lowBatteryDevices: Awaited<ReturnType<typeof lowBatteryQuery>> = []
+    type DeviceWithVillage = Prisma.DeviceGetPayload<{ include: { village: true } }>
+    let lowBatteryDevices: DeviceWithVillage[] = []
 
     try {
         const result = await Promise.all([
@@ -31,7 +24,15 @@ export default async function DashboardPage() {
                 orderBy: { syncedAt: 'desc' },
                 include: { device: { include: { village: true } } }
             }),
-            lowBatteryQuery
+            prisma.device.findMany({
+                where: {
+                    OR: [
+                        { batteryPct: { lt: 20 } },
+                        { lastSync: { lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }
+                    ]
+                },
+                include: { village: true }
+            })
         ])
         devicesCount = result[0]
         studentsCount = result[1]
