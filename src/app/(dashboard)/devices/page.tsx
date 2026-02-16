@@ -1,12 +1,17 @@
 import { prisma } from "@/lib/prisma"
+import type { Prisma } from "@prisma/client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { DeviceStatusBadge } from "@/components/device-status-badge"
 import { Battery, Signal, Sun, Calendar, ChevronRight } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 
+type DeviceWithVillageAndCount = Prisma.DeviceGetPayload<{
+    include: { village: true; _count: { select: { students: true } } }
+}>
+
 export default async function DevicesPage() {
-    let devices: Awaited<ReturnType<typeof prisma.device.findMany>> = []
+    let devices: DeviceWithVillageAndCount[] = []
     try {
         devices = await prisma.device.findMany({
             include: {
