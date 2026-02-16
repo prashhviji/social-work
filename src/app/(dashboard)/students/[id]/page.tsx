@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils"
 import { notFound } from "next/navigation"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs" // Needed to create tabs component
 import { SkillTree } from "@/components/skill-tree"
