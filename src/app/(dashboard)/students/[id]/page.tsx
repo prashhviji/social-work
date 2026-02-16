@@ -9,22 +9,29 @@ import { PerformanceRadar } from "@/components/performance-radar"
 import { format } from "date-fns"
 import { CheckCircle2, Clock, ScrollText } from "lucide-react"
 
-export default async function StudentProfilePage({ params }: { params: { id: string } }) {
-    const student = await prisma.student.findUnique({
-        where: { id: params.id },
-        include: {
-            village: true,
-            device: true,
-            progress: {
-                include: { skillNode: { include: { subject: true } } }
-            },
-            submissions: {
-                orderBy: { createdAt: 'desc' },
-                take: 10,
-                include: { skillNode: true }
+export default async function StudentProfilePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
+    let student
+    try {
+        student = await prisma.student.findUnique({
+            where: { id },
+            include: {
+                village: true,
+                device: true,
+                progress: {
+                    include: { skillNode: { include: { subject: true } } }
+                },
+                submissions: {
+                    orderBy: { createdAt: 'desc' },
+                    take: 10,
+                    include: { skillNode: true }
+                }
             }
-        }
-    })
+        })
+    } catch (error) {
+        console.warn("Database unreachable:", error)
+        notFound()
+    }
 
     if (!student) notFound()
 

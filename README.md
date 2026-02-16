@@ -14,7 +14,7 @@ A full-stack Next.js application for managing solar-powered, offline adaptive le
 -   **Framework**: Next.js 14+ (App Router)
 -   **Language**: TypeScript
 -   **Styling**: Tailwind CSS (v4) + Shadcn/ui (custom implementation)
--   **Database**: SQLite (via Prisma)
+-   **Database**: PostgreSQL (via Prisma)
 -   **Auth**: NextAuth.js v5
 -   **State**: Zustand + React Query
 -   **Visualization**: Recharts + Framer Motion
@@ -44,6 +44,21 @@ A full-stack Next.js application for managing solar-powered, offline adaptive le
     -   **Landing Page**: `http://localhost:3000`
     -   **Dashboard**: `http://localhost:3000/dashboard`
     -   **Login**: `http://localhost:3000/login`
+
+## Troubleshooting
+
+### `EPERM: operation not permitted` when running `prisma generate`
+
+This happens on Windows when another process (usually the Next.js dev server) has the Prisma query engine DLL loaded, so Prisma cannot replace it.
+
+**Fix:**
+1. Stop any running dev server (`npm run dev`) and other terminals that use this project.
+2. Run `npx prisma generate` again.
+3. If it still fails, remove the generated client and regenerate (with all Node processes stopped):
+   ```bash
+   Remove-Item -Recurse -Force node_modules\.prisma
+   npx prisma generate
+   ```
 
 ## Demo Credentials
 

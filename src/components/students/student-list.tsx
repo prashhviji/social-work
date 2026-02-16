@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Search, Filter, ChevronDown, MoreHorizontal } from "lucide-react"
+import { Search, Filter, ChevronDown, ChevronRight, MoreHorizontal } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
@@ -15,18 +15,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table" // Missing table component - will create inline styles or simple table for now
-
-// Since I didn't create Table component yet, I'll use standard HTML table with Tailwind classes
-// matching shadcn style
-
 interface Student {
     id: string
     firstName: string

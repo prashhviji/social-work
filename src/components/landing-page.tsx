@@ -64,7 +64,7 @@ export function LandingPage({ stats }: LandingPageProps) {
                             </Link>
                             <Link href="/dashboard">
                                 <Button variant="outline" size="lg" className="text-lg px-8 py-6 rounded-full border-warm-400 text-warm-800 hover:bg-warm-100">
-                                    Dashboard Login
+                                    Dashboard
                                 </Button>
                             </Link>
                         </motion.div>

@@ -7,21 +7,28 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { format } from "date-fns"
 import { Battery, Sun, Signal, Wifi, Activity, AlertCircle } from "lucide-react"
 
-export default async function DeviceDetailPage({ params }: { params: { id: string } }) {
-    const device = await prisma.device.findUnique({
-        where: { id: params.id },
-        include: {
-            village: true,
-            syncEvents: {
-                orderBy: { syncedAt: 'desc' },
-                take: 20
-            },
-            powerLogs: {
-                where: { loggedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } }, // Last 24h
-                orderBy: { loggedAt: 'asc' }
+export default async function DeviceDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
+    let device
+    try {
+        device = await prisma.device.findUnique({
+            where: { id },
+            include: {
+                village: true,
+                syncEvents: {
+                    orderBy: { syncedAt: 'desc' },
+                    take: 20
+                },
+                powerLogs: {
+                    where: { loggedAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } }, // Last 24h
+                    orderBy: { loggedAt: 'asc' }
+                }
             }
-        }
-    })
+        })
+    } catch (error) {
+        console.warn("Database unreachable:", error)
+        notFound()
+    }
 
     if (!device) notFound()
 

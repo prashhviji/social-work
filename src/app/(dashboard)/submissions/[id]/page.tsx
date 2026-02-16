@@ -6,14 +6,21 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { AlertCircle, BrainCircuit } from "lucide-react"
 
-export default async function SubmissionDetailPage({ params }: { params: { id: string } }) {
-    const submission = await prisma.submission.findUnique({
-        where: { id: params.id },
-        include: {
-            student: { include: { village: true } },
-            skillNode: { include: { subject: true } }
-        }
-    })
+export default async function SubmissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params
+    let submission
+    try {
+        submission = await prisma.submission.findUnique({
+            where: { id },
+            include: {
+                student: { include: { village: true } },
+                skillNode: { include: { subject: true } }
+            }
+        })
+    } catch (error) {
+        console.warn("Database unreachable:", error)
+        notFound()
+    }
 
     if (!submission) notFound()
 

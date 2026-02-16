@@ -8,14 +8,19 @@ import { formatDistanceToNow } from "date-fns"
 import { Check, X, Eye } from "lucide-react"
 
 export default async function SubmissionsPage() {
-    const submissions = await prisma.submission.findMany({
-        where: { status: 'PENDING' },
-        include: {
-            student: { include: { village: true } },
-            skillNode: { include: { subject: true } }
-        },
-        orderBy: { createdAt: 'desc' }
-    })
+    let submissions: Awaited<ReturnType<typeof prisma.submission.findMany>> = []
+    try {
+        submissions = await prisma.submission.findMany({
+            where: { status: 'PENDING' },
+            include: {
+                student: { include: { village: true } },
+                skillNode: { include: { subject: true } }
+            },
+            orderBy: { createdAt: 'desc' }
+        })
+    } catch (error) {
+        console.warn("Database unreachable:", error)
+    }
 
     return (
         <div className="space-y-6">

@@ -45,7 +45,7 @@ export function MarketingNav() {
                     ))}
                     <Link href="/dashboard">
                         <Button variant="default" size="sm">
-                            Dashboard Login
+                            Dashboard
                         </Button>
                     </Link>
                 </nav>
@@ -79,7 +79,7 @@ export function MarketingNav() {
                     ))}
                     <div className="pt-2 border-t">
                         <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                            <Button className="w-full">Dashboard Login</Button>
+                            <Button className="w-full">Dashboard</Button>
                         </Link>
                     </div>
                 </div>

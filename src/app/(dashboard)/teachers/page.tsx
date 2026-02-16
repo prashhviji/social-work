@@ -4,10 +4,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { UserPlus, Mail, Phone, MapPin } from "lucide-react"
 
 export default async function TeachersPage() {
-    const teachers = await prisma.user.findMany({
-        where: { role: "TEACHER" },
-        include: { village: true }
-    })
+    let teachers: Awaited<ReturnType<typeof prisma.user.findMany>> = []
+    try {
+        teachers = await prisma.user.findMany({
+            where: { role: "TEACHER" },
+            include: { village: true }
+        })
+    } catch (error) {
+        console.warn("Database unreachable:", error)
+    }
 
     return (
         <div className="space-y-6">

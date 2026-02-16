@@ -6,13 +6,18 @@ import { Battery, Signal, Sun, Calendar, ChevronRight } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 
 export default async function DevicesPage() {
-    const devices = await prisma.device.findMany({
-        include: {
-            village: true,
-            _count: { select: { students: true } }
-        },
-        orderBy: { villageId: 'asc' }
-    })
+    let devices: Awaited<ReturnType<typeof prisma.device.findMany>> = []
+    try {
+        devices = await prisma.device.findMany({
+            include: {
+                village: true,
+                _count: { select: { students: true } }
+            },
+            orderBy: { villageId: 'asc' }
+        })
+    } catch (error) {
+        console.warn("Database unreachable:", error)
+    }
 
     return (
         <div className="space-y-6">

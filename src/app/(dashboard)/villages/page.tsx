@@ -4,17 +4,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MapPin, Users, TabletSmartphone } from "lucide-react"
 
 export default async function VillagesPage() {
-    const villages = await prisma.village.findMany({
-        include: {
-            _count: {
-                select: {
-                    students: true,
-                    devices: true,
-                    users: true
+    let villages: Awaited<ReturnType<typeof prisma.village.findMany>> = []
+    try {
+        villages = await prisma.village.findMany({
+            include: {
+                _count: {
+                    select: {
+                        students: true,
+                        devices: true,
+                        users: true
+                    }
                 }
             }
-        }
-    })
+        })
+    } catch (error) {
+        console.warn("Database unreachable:", error)
+    }
 
     return (
         <div className="space-y-6">

@@ -6,7 +6,6 @@ import {
     Users,
     MapPin,
     LayoutDashboard,
-    LogOut,
     Settings,
     UserCircle,
     TabletSmartphone,
@@ -25,14 +24,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
-// For now import signIn/signOut from next-auth/react in client component? 
-// No, next-auth v5 uses server actions mostly, but useSession works in client.
-// Actually signOut in v5 is server-side friendly. For client, we can use signIn/signOut from 'next-auth/react' if using SessionProvider.
-import { signOut, useSession } from "next-auth/react"
 
 export function DashboardSidebar() {
     const pathname = usePathname()
-    const { data: session } = useSession()
 
     const navItems = [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -81,15 +75,15 @@ export function DashboardSidebar() {
                                 <Avatar className="h-8 w-8">
                                     <AvatarImage src="" />
                                     <AvatarFallback className="bg-primary/10 text-primary">
-                                        {session?.user?.name?.charAt(0) || "U"}
+                                        U
                                     </AvatarFallback>
                                 </Avatar>
                                 <div className="flex flex-col items-start text-left">
                                     <span className="text-sm font-medium truncate w-[140px]">
-                                        {session?.user?.name || "User"}
+                                        User
                                     </span>
                                     <span className="text-xs text-muted-foreground truncate w-[140px]">
-                                        {session?.user?.email || "user@example.com"}
+                                        Dashboard
                                     </span>
                                 </div>
                             </div>
@@ -101,13 +95,6 @@ export function DashboardSidebar() {
                         <DropdownMenuItem>
                             <Settings className="mr-2 h-4 w-4" />
                             Settings
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            className="text-destructive focus:text-destructive"
-                            onClick={() => signOut({ callbackUrl: "/" })}
-                        >
-                            <LogOut className="mr-2 h-4 w-4" />
-                            Log out
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

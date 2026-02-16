@@ -4,19 +4,26 @@ import { Button } from "@/components/ui/button"
 import { UserPlus } from "lucide-react"
 
 export default async function StudentsPage() {
-    const students = await prisma.student.findMany({
-        include: {
-            village: true,
-            device: true,
-            _count: {
-                select: {
-                    progress: true,
-                    submissions: true
+    let students: Awaited<ReturnType<typeof prisma.student.findMany<{
+        include: { village: true; device: true; _count: { select: { progress: true; submissions: true } } }
+    }>>> = []
+    try {
+        students = await prisma.student.findMany({
+            include: {
+                village: true,
+                device: true,
+                _count: {
+                    select: {
+                        progress: true,
+                        submissions: true
+                    }
                 }
-            }
-        },
-        orderBy: { enrolledAt: 'desc' }
-    })
+            },
+            orderBy: { enrolledAt: 'desc' }
+        })
+    } catch (error) {
+        console.warn("Database unreachable:", error)
+    }
 
     return (
         <div className="space-y-6">

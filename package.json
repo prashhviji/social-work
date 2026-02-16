@@ -9,11 +9,7 @@
     "lint": "eslint",
     "postinstall": "prisma generate"
   },
-  "prisma": {
-    "seed": "npx tsx prisma/seed.ts"
-  },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.11.1",
     "@hookform/resolvers": "^5.2.2",
     "@prisma/client": "^6.19.2",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -35,7 +31,6 @@
     "framer-motion": "^12.34.0",
     "lucide-react": "^0.563.0",
     "next": "16.1.6",
-    "next-auth": "^5.0.0-beta.30",
     "prisma": "^6.19.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",

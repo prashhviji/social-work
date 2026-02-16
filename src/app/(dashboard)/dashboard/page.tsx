@@ -6,32 +6,41 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatDistanceToNow } from "date-fns"
 
 export default async function DashboardPage() {
-    // Fetch data
-    const [
-        devicesCount,
-        studentsCount,
-        submissionsCount,
-        recentSyncs,
-        lowBatteryDevices
-    ] = await Promise.all([
-        prisma.device.count(),
-        prisma.student.count(),
-        prisma.submission.count(),
-        prisma.syncEvent.findMany({
-            take: 5,
-            orderBy: { syncedAt: 'desc' },
-            include: { device: { include: { village: true } } }
-        }),
-        prisma.device.findMany({
-            where: {
-                OR: [
-                    { batteryPct: { lt: 20 } },
-                    { lastSync: { lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }
-                ]
-            },
-            include: { village: true }
-        })
-    ])
+    let devicesCount = 0
+    let studentsCount = 0
+    let submissionsCount = 0
+    let recentSyncs: Awaited<ReturnType<typeof prisma.syncEvent.findMany<{ include: { device: { include: { village: true } } } }>>> = []
+    const lowBatteryQuery = prisma.device.findMany({
+        where: {
+            OR: [
+                { batteryPct: { lt: 20 } },
+                { lastSync: { lt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }
+            ]
+        },
+        include: { village: true }
+    })
+    let lowBatteryDevices: Awaited<ReturnType<typeof lowBatteryQuery>> = []
+
+    try {
+        const result = await Promise.all([
+            prisma.device.count(),
+            prisma.student.count(),
+            prisma.submission.count(),
+            prisma.syncEvent.findMany({
+                take: 5,
+                orderBy: { syncedAt: 'desc' },
+                include: { device: { include: { village: true } } }
+            }),
+            lowBatteryQuery
+        ])
+        devicesCount = result[0]
+        studentsCount = result[1]
+        submissionsCount = result[2]
+        recentSyncs = result[3]
+        lowBatteryDevices = result[4]
+    } catch (error) {
+        console.warn("Database unreachable, using fallback data:", error)
+    }
 
     // Mock data for charts (in real app, aggregate from db)
     const weeklyActivity = [
