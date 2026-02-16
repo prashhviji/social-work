@@ -34,7 +34,7 @@ export default async function StudentsPage() {
                         Manage student enrollment and track progress across villages.
                     </p>
                 </div>
-                < Button>
+                <Button>
                     <UserPlus className="mr-2 h-4 w-4" />
                     Enrol Student
                 </Button>

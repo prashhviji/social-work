@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import type { Prisma } from "@prisma/client"
 import { notFound } from "next/navigation"
 import { SubmissionReviewForm } from "@/components/submission-review-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -6,9 +7,13 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { AlertCircle, BrainCircuit } from "lucide-react"
 
+type SubmissionWithRelations = Prisma.SubmissionGetPayload<{
+    include: { student: { include: { village: true } }; skillNode: { include: { subject: true } } }
+}>
+
 export default async function SubmissionDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
-    let submission
+    let submission: SubmissionWithRelations | null = null
     try {
         submission = await prisma.submission.findUnique({
             where: { id },

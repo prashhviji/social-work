@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import type { Prisma } from "@prisma/client"
 import { notFound } from "next/navigation"
 import { DeviceStatusBadge } from "@/components/device-status-badge"
 import { PowerChart } from "@/components/power-chart"
@@ -7,9 +8,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { format } from "date-fns"
 import { Battery, Sun, Signal, Wifi, Activity, AlertCircle } from "lucide-react"
 
+type DeviceWithRelations = Prisma.DeviceGetPayload<{
+    include: { village: true; syncEvents: true; powerLogs: true }
+}>
+
 export default async function DeviceDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
-    let device
+    let device: DeviceWithRelations | null = null
     try {
         device = await prisma.device.findUnique({
             where: { id },

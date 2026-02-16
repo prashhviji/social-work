@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma"
+import type { Prisma } from "@prisma/client"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -7,8 +8,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { formatDistanceToNow } from "date-fns"
 import { Check, X, Eye } from "lucide-react"
 
+type SubmissionWithRelations = Prisma.SubmissionGetPayload<{
+    include: { student: { include: { village: true } }; skillNode: { include: { subject: true } } }
+}>
+
 export default async function SubmissionsPage() {
-    let submissions: Awaited<ReturnType<typeof prisma.submission.findMany>> = []
+    let submissions: SubmissionWithRelations[] = []
     try {
         submissions = await prisma.submission.findMany({
             where: { status: 'PENDING' },

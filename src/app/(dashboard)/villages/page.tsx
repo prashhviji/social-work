@@ -1,10 +1,15 @@
 import { prisma } from "@/lib/prisma"
+import type { Prisma } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MapPin, Users, TabletSmartphone } from "lucide-react"
 
+type VillageWithCount = Prisma.VillageGetPayload<{
+    include: { _count: { select: { students: true; devices: true; users: true } } }
+}>
+
 export default async function VillagesPage() {
-    let villages: Awaited<ReturnType<typeof prisma.village.findMany>> = []
+    let villages: VillageWithCount[] = []
     try {
         villages = await prisma.village.findMany({
             include: {
@@ -65,7 +70,7 @@ export default async function VillagesPage() {
                                 </div>
                             </div>
                             <div className="mt-4 pt-4 border-t text-xs text-muted-foreground">
-                                Region: {village.region} • Language: {village.language}
+                                {village.district}, {village.state}
                             </div>
                         </CardContent>
                     </Card>

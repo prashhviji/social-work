@@ -1,10 +1,13 @@
 import { prisma } from "@/lib/prisma"
+import type { Prisma } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { UserPlus, Mail, Phone, MapPin } from "lucide-react"
 
+type UserWithVillage = Prisma.UserGetPayload<{ include: { village: true } }>
+
 export default async function TeachersPage() {
-    let teachers: Awaited<ReturnType<typeof prisma.user.findMany>> = []
+    let teachers: UserWithVillage[] = []
     try {
         teachers = await prisma.user.findMany({
             where: { role: "TEACHER" },
@@ -33,7 +36,7 @@ export default async function TeachersPage() {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Naame</TableHead>
+                            <TableHead>Name</TableHead>
                             <TableHead>Assigned Village</TableHead>
                             <TableHead>Email</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
